@@ -45,11 +45,11 @@ python3-screeninfo
 
 # Wayland / Hyprland
 hyprland
-hyprpaper
 hyprlock
 hypridle
 hyprpicker
 hyprsunset
+hyprland-guiutils
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 uwsm
