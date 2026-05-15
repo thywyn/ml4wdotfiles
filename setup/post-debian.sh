@@ -30,13 +30,61 @@ fi
 
 # --------------------------------------------------------------
 # Cargo (matugen, awww)
+#
+# Binaries are built under a temporary --root, then installed to
+# /usr/local/bin so they are on the PATH for every user session
+# — including Hyprland's exec-once environment, which does NOT
+# include ~/.cargo/bin or ~/.local/bin by default.
 # --------------------------------------------------------------
 
 MATUGEN_TARGET="4.0.0"
 
+CARGO_BUILD_ROOT="$(mktemp -d -t cargo-build-XXXXXX)"
+trap 'rm -rf "$CARGO_BUILD_ROOT"' EXIT
+
+# Migrate any pre-existing cargo-installed copies from ~/.cargo/bin to
+# /usr/local/bin so they are visible to Hyprland's exec-once PATH. The
+# old copies are removed afterward to avoid two versions on PATH.
+migrate_cargo_bin() {
+    local b src="$HOME/.cargo/bin"
+    for b in "$@"; do
+        if [ -x "$src/$b" ] && [ ! -e "/usr/local/bin/$b" ]; then
+            info "Migrating $b from $src to /usr/local/bin (sudo)..."
+            sudo install -m 0755 "$src/$b" "/usr/local/bin/$b"
+        fi
+        if [ -e "$src/$b" ] && [ -x "/usr/local/bin/$b" ]; then
+            info "Removing stale $src/$b (now provided by /usr/local/bin)."
+            rm -f "$src/$b"
+        fi
+    done
+}
+
+migrate_cargo_bin matugen awww awww-daemon
+
+cargo_install_system() {
+    # Usage: cargo_install_system <log-label> -- <cargo install args...>
+    local label="$1"; shift
+    [ "$1" = "--" ] && shift
+    info "Building $label via cargo (temp root: $CARGO_BUILD_ROOT)..."
+    cargo install --root "$CARGO_BUILD_ROOT" "$@"
+}
+
+install_built_bins() {
+    # Usage: install_built_bins <bin> [<bin>...]
+    local b
+    for b in "$@"; do
+        if [ ! -x "$CARGO_BUILD_ROOT/bin/$b" ]; then
+            error "Expected binary $b not found after build."
+            return 1
+        fi
+        info "Installing $b to /usr/local/bin (sudo)..."
+        sudo install -m 0755 "$CARGO_BUILD_ROOT/bin/$b" "/usr/local/bin/$b"
+    done
+}
+
 force_install_matugen() {
-    info "Running: cargo install matugen --force"
-    cargo install matugen --force
+    cargo_install_system matugen -- matugen --force
+    install_built_bins matugen
 }
 
 if ! command -v matugen &> /dev/null; then
@@ -55,7 +103,8 @@ fi
 
 if ! command -v awww &> /dev/null; then
     info "Installing awww + awww-daemon via cargo (codeberg source)..."
-    cargo install --git https://codeberg.org/LGFae/awww awww awww-daemon
+    cargo_install_system awww -- --git https://codeberg.org/LGFae/awww awww awww-daemon
+    install_built_bins awww awww-daemon
 else
     info "awww already installed."
 fi
