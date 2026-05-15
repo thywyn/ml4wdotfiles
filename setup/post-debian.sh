@@ -17,7 +17,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends g
 
 ML4W_SETTINGS_TMP=$(mktemp -d -t ml4w-dotfiles-settings-XXXXXX)
 info "Cloning ML4W Dotfiles Settings into $ML4W_SETTINGS_TMP..."
-git clone --depth=1 https://github.com/mylinuxforwork/ml4w-dotfiles-settings.git "$ML4W_SETTINGS_TMP"
+git clone --depth=1 https://github.com/thywyn/ml4w-dotfiles-settings.git "$ML4W_SETTINGS_TMP"
 make -C "$ML4W_SETTINGS_TMP" install
 rm -rf "$ML4W_SETTINGS_TMP"
 
