@@ -20,6 +20,8 @@ flock -n 200 || exit 0
 
 killall waybar || true
 pkill waybar || true
+# Stop the systemd service to prevent Restart=on-failure from re-launching with default config
+systemctl --user stop waybar.service 2>/dev/null || true
 sleep 0.5
 
 # -----------------------------------------------------
