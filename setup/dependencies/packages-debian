@@ -44,6 +44,7 @@ python3-gi
 python3-screeninfo
 
 # Wayland / Hyprland
+at-spi2-core
 hyprland
 hyprlock
 hypridle
