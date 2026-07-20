@@ -1,3 +1,38 @@
+Version 2.14.2
+--------------------------------------------------------
+- Scratchpad feature updated: SUPER + SHIFT + S to move the current window into the scratchpad workspace.
+  SUPER + S to toggle the scatchpad workspace.
+
+Version 2.14.1
+--------------------------------------------------------
+- The Quickshell statusbar can be configured in ~/.config/ml4w-statusbar/statusbar.json The file must be created individually. The full list of configuration options are available here: https://ml4w.com/os/ml4w-apps/statusbar
+- You can keep the status bar expanded with new setting "alwaysExpanded": true for the bar section. Also available as a toggle switch in the sidebar.
+- Flexible width for the statusbar if the width of "expandedWidth": 680 is not enough.
+- New status bar modules: Volume control, battery status, power profile plus submenu
+- Status Bar (Waybar or Quickshell) can be reloaded with SUPER + SHIFT + B and toggled with SUPER + CTRL + B
+- Added Network Manager Applet (nm-applet) to ml4w-autostart
+- Rofi menues can be closed by clicking outside of Rofi.
+
+Version 2.14.0
+--------------------------------------------------------
+- New optional Quickshell-based statusbar — activate in Sidebar, expand with hover or SUPER + SPACE
+- Added Dock autohide toggle to Sidebar
+- Multi-layout keyboard switching via ALT + SHIFT (configure layouts in input.lua, e.g. kb_layout = "de,us")
+- Toggle special workspace with SUPER + SHIFT + S
+- Navigate Powermenu options with arrow keys, confirm with Return
+- New SVG icons for Powermenu and Sidebar
+- Sidepad temporarily removed — will be replaced by a new scratchpad feature
+
+Version 2.13.0
+--------------------------------------------------------
+- Hyprland Configuration converted into new lua format.
+- hyprsysteminfo added to Welcome App
+- hyprshutdown added to Power App
+- Add .conf cleanup script ~/.config/ml4w/scripts/ml4w-remove-conf to remove all .conf files from ~/.config/hypr that has been replaced with .lua
+- Wallpaper folder can be set directly in the wallpaper widget
+- Prepared for HyprMod. Can be installed from the Welcome App. Shows additional launch buttons on Welcome App and Sidebar if installed.
+- Drop Shadows added to Quickshell PanelWindows for UI consistance.
+
 Version 2.12.3
 --------------------------------------------------------
 - Compatible with Hyprland 0.55.x (legacy conf). Change to Lua will follow soon with 2.13.

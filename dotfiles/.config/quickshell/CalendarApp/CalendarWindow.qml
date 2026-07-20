@@ -5,6 +5,7 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Effects
 import qs.CustomTheme
 
 PanelWindow {
@@ -14,13 +15,12 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     exclusionMode: WlrLayershell.Ignore
     
-    implicitWidth: 340
-    implicitHeight: 340 
+    implicitWidth: 380
+    implicitHeight: 380 
     color: "transparent"
 
-    // Anchored to the Upper Side
+    // Anchored to the top, horizontally centered (no left/right anchor).
     anchors {
-        left: true
         top: true
     }
 
@@ -72,11 +72,10 @@ PanelWindow {
     }
     
     // Animate between your specific 87px top margin and off-screen (-800)
-    property real currentTopMargin: isOpen ? 87 : -800 
+    property real currentTopMargin: isOpen ? 67 : -820 
 
-    margins { 
+    margins {
         top: root.currentTopMargin
-        left: 20
     }
 
     Behavior on currentTopMargin {
@@ -98,20 +97,43 @@ PanelWindow {
         target: "calendar"
         function toggle(): void { root.isOpen = !root.isOpen }
         function open(): void { root.isOpen = true }   
-        function close(): void { root.isOpen = false } 
+        function close(): void { root.isOpen = false }
+        function isOpen(): bool { return root.isOpen }
     }
 
     // --- REUSABLE COMPONENTS ---
     component ActionIcon: Button {
         property string iconTxt: ""
-        implicitWidth: 28  
+        property string iconSrc: ""
+        implicitWidth: 28
         implicitHeight: 28
-        text: iconTxt
-        font.family: "monospace"
         background: Rectangle { color: "transparent" }
-        contentItem: Text { 
-            text: parent.text; color: Theme.primary; font.pixelSize: 18; 
-            verticalAlignment: Text.AlignVCenter; horizontalAlignment: Text.AlignHCenter
+        contentItem: Item {
+            Text {
+                anchors.centerIn: parent
+                text: iconTxt
+                visible: iconSrc === ""
+                color: Theme.primary
+                font.family: "monospace"
+                font.pixelSize: 18
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
+            Image {
+                anchors.centerIn: parent
+                source: iconSrc
+                width: 18
+                height: 18
+                sourceSize.width: 18
+                sourceSize.height: 18
+                visible: iconSrc !== ""
+                fillMode: Image.PreserveAspectFit
+                layer.enabled: iconSrc !== ""
+                layer.effect: MultiEffect {
+                    colorization: 1.0
+                    colorizationColor: Theme.primary
+                }
+            }
         }
     }
 
@@ -211,14 +233,36 @@ PanelWindow {
     // ==========================================
     Item {
         anchors.fill: parent
+        anchors.margins: 20
+
+        RectangularShadow {
+            id: shadow
+            anchors.fill: mainBgRect
+            radius: mainBgRect.radius
+            blur: 15
+            color: Qt.rgba(Theme.shadow.r, Theme.shadow.g, Theme.shadow.b, 0.4)
+        }
 
         Rectangle {
+            id: mainBgRect
             anchors.fill: parent
-            color: Theme.background
-            border.color: Theme.primary
-            border.width: 2
             radius: 10
             opacity: 0.95 // Only the background is transparent
+
+            // Gradient border (outer)
+            gradient: Gradient {
+                orientation: Gradient.Vertical
+                GradientStop { position: 0.0; color: Theme.primary }
+                GradientStop { position: 1.0; color: Theme.on_primary }
+            }
+
+            // Background fill (inner), inset by the border thickness
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 2
+                radius: parent.radius - anchors.margins
+                color: Theme.background
+            }
         }
 
         ColumnLayout {
@@ -235,8 +279,8 @@ PanelWindow {
                     anchors.centerIn: parent
                     spacing: 5
                     
-                    ActionIcon { 
-                        iconTxt: "" 
+                    ActionIcon {
+                        iconSrc: "../shared/icons/chevron-left.svg"
                         onClicked: prevMonth()
                     }
                     
@@ -250,8 +294,8 @@ PanelWindow {
                         horizontalAlignment: Text.AlignHCenter
                     }
                     
-                    ActionIcon { 
-                        iconTxt: "" 
+                    ActionIcon {
+                        iconSrc: "../shared/icons/chevron-right.svg"
                         onClicked: nextMonth()
                     }
                 }

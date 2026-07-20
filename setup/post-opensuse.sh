@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 
 # --------------------------------------------------------------
+# nwg-displays
+# --------------------------------------------------------------
+
+if rpm -q nwg-displays &>/dev/null; then
+    sudo zypper rm -y nwg-displays
+fi
+info "Building and deploying latest nwg-displays..."
+NWG_DISPLAYS_BUILD_DIR=$(mktemp -d)
+git clone https://github.com/nwg-piotr/nwg-displays.git "$NWG_DISPLAYS_BUILD_DIR"
+python3 -m pip install --user --break-system-packages "$NWG_DISPLAYS_BUILD_DIR"
+info "nwg-displays installed to ~/.local/bin/"
+rm -rf $NWG_DISPLAYS_BUILD_DIR
+
+# --------------------------------------------------------------
 # awww
 # --------------------------------------------------------------
 
@@ -70,7 +84,7 @@ pipx install pywalfox
 # Grimblast
 # --------------------------------------------------------------
 
-sudo cp $repo_path/setup/scripts/grimblast /usr/bin
+source $repo_path/setup/clean-install-grimblast.sh
 
 # --------------------------------------------------------------
 # Cursors
