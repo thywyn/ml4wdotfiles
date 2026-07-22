@@ -67,7 +67,7 @@ cargo_install_system() {
     local label="$1"
     local _gitrepo="$2"
     info "Building ${label} via cargo (temp root: ${CARGO_BUILD_ROOT})..."
-    git clone --branch "${AWWW_VERSION}" --depth 1 "${_gitrepo}" \
+    git clone --depth 1 "${_gitrepo}" \
       "${CARGO_BUILD_ROOT}/${label}" && \
     cargo build --release --locked --workspace --bins \
       --manifest-path ${CARGO_BUILD_ROOT}/${label}/Cargo.toml \
@@ -109,7 +109,7 @@ fi
 
 if ! command -v awww &> /dev/null; then
     info "Installing awww + awww-daemon via cargo (codeberg source)..."
-    cargo_install_system awww https://github.com/thywyn/awww.git
+    cargo_install_system awww https://codeberg.org/LGFae/awww.git
     install_built_bins awww awww-daemon
 else
     info "awww already installed."
