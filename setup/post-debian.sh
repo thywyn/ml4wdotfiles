@@ -38,6 +38,7 @@ fi
 # --------------------------------------------------------------
 
 MATUGEN_TARGET="4.0.0"
+AWWW_VERSION="0.12.1"
 
 CARGO_BUILD_ROOT="$(mktemp -d -t cargo-build-XXXXXX)"
 trap 'rm -rf "$CARGO_BUILD_ROOT"' EXIT
