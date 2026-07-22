@@ -38,6 +38,7 @@ fi
 # --------------------------------------------------------------
 
 MATUGEN_TARGET="4.0.0"
+AWWW_VERSION="0.12.1"
 
 CARGO_BUILD_ROOT="$(mktemp -d -t cargo-build-XXXXXX)"
 trap 'rm -rf "$CARGO_BUILD_ROOT"' EXIT
@@ -63,10 +64,14 @@ migrate_cargo_bin matugen awww awww-daemon
 
 cargo_install_system() {
     # Usage: cargo_install_system <log-label> -- <cargo install args...>
-    local label="$1"; shift
-    [ "$1" = "--" ] && shift
-    info "Building $label via cargo (temp root: $CARGO_BUILD_ROOT)..."
-    cargo install --root "$CARGO_BUILD_ROOT" "$@"
+    local label="$1"
+    local _gitrepo="$2"
+    info "Building ${label} via cargo (temp root: ${CARGO_BUILD_ROOT})..."
+    git clone --branch "${AWWW_VERSION}" --depth 1 "${_gitrepo}" \
+      "${CARGO_BUILD_ROOT}/${label}" && \
+    cargo build --release --locked --workspace --bins \
+      --manifest-path ${CARGO_BUILD_ROOT}/${label}/Cargo.toml \
+      --target-dir ${CARGO_BUILD_ROOT}/bin
 }
 
 install_built_bins() {
@@ -83,7 +88,8 @@ install_built_bins() {
 }
 
 force_install_matugen() {
-    cargo_install_system matugen -- matugen --force
+    info "Building matugen via cargo (temp root: $CARGO_BUILD_ROOT)..."
+    cargo install --root "$CARGO_BUILD_ROOT" matugen --force
     install_built_bins matugen
 }
 
@@ -103,7 +109,7 @@ fi
 
 if ! command -v awww &> /dev/null; then
     info "Installing awww + awww-daemon via cargo (codeberg source)..."
-    cargo_install_system awww -- --git https://codeberg.org/LGFae/awww awww awww-daemon
+    cargo_install_system awww https://github.com/thywyn/awww.git
     install_built_bins awww awww-daemon
 else
     info "awww already installed."
