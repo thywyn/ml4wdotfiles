@@ -17,6 +17,29 @@ DIST="${DEBIAN_DIR}/dist"
 
 info() { printf '\033[1;32m::\033[0m %s\n' "$*"; }
 
+enable_debian_backports() {
+    info "Enabling backports repository"
+    . /etc/os-release
+
+    [ "$ID" = "debian" ] && [ -n "$VERSION_CODENAME" ] || {
+        echo "This function requires Debian with VERSION_CODENAME set." >&2
+        return 1
+    }
+
+    sudo tee /etc/apt/sources.list.d/debian-backports.sources >/dev/null <<EOF
+Types: deb
+URIs: https://deb.debian.org/debian
+Suites: ${VERSION_CODENAME}-backports
+Components: main
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+EOF
+
+    sudo apt-get update
+}
+
+enable_debian_backports
+
 info "apt update"
 sudo DEBIAN_FRONTEND=noninteractive apt-get update
 
