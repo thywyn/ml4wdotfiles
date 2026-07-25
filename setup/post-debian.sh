@@ -77,13 +77,15 @@ cargo_install_system() {
 install_built_bins() {
     # Usage: install_built_bins <bin> [<bin>...]
     local b
+    local built_path
     for b in "$@"; do
-        if [ ! -x "$CARGO_BUILD_ROOT/bin/$b" ]; then
+        built_path=$(find $CARGO_BUILD_ROOT -type f -name $b)
+        if [ -z "$built_path" ]; then
             error "Expected binary $b not found after build."
             return 1
         fi
         info "Installing $b to /usr/local/bin (sudo)..."
-        sudo install -m 0755 "$CARGO_BUILD_ROOT/bin/$b" "/usr/local/bin/$b"
+        sudo install -m 0755 "$built_path" "/usr/local/bin/$b"
     done
 }
 
